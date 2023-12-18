@@ -82,7 +82,7 @@ class gen_tb_io:
 						module = re.sub(r'[0-9]+$', '', instance)
 						#pinmux_table.at[pinmux_table_row_index,'module'] = re.sub(r'[0-9]+$', '', instance)
 						#pinmux_table.at[pinmux_table_row_index,'instance'] = instance
-						pad_func = func.split('.')[2]
+						pad_func = func.split('.')[3]
 						pad_func = pad_func.replace('[','')
 						pad_func = pad_func.replace(']','')
 						#pinmux_table.at[pinmux_table_row_index,'pad_func'] = pad_func
@@ -139,43 +139,11 @@ class gen_tb_io:
 						module = re.sub(r'[0-9]+$', '', instance)
 						#remove "P" from instance
 						module = re.sub(r'^P', '', instance)
-						pad_func = func.split('.')[2]
+						pad_func = func.split('.')[3]
 						pad_func = pad_func.replace('[','')
 						pad_func = pad_func.replace(']','')
 						if len(pinmux_table[(pinmux_table.module==module)&(pinmux_table.instance==instance)&(pinmux_table.pad_func==pad_func)].index.tolist()) == 0:
 							pinmux_table.loc[len(pinmux_table)] = {'module':module,'instance':instance,'pad_func':pad_func,'alt':column_shift,'domain':'pmic'}
-						option = func.split('.')[1]
-						pad_opt_list = self.get_opt_list(option)
-						pinmux_table_row_index = pinmux_table[(pinmux_table.module==module)&(pinmux_table.instance==instance)&(pinmux_table.pad_func==pad_func)].index.tolist()[0]
-						for i_opt_value in pad_opt_list:
-						 	pinmux_table.at[pinmux_table_row_index, i_opt_value] = ballname.value
-
-		#pinmux_batt
-		ws = wb['PINMUX_BATT']
-		row_index = 0
-		for ballname in ws['I']: #column I is "BALLNAME"
-			row_index += 1
-			#name = ballname.value
-			if row_index == 1:
-				if ballname.value != 'BALLNAME':
-					print('Error column')
-			elif ballname.value == None:
-				break
-			elif fnmatch(ballname.value, 'PZ*'):
-				column_base = column_index_from_string('N') #column N is ALT0(GPIO)
-				for column_shift in range(1,3):
-					func = ws.cell(row=row_index, column=(column_base+column_shift)).value
-					#print (column_shift)
-					if func != None:
-						instance = func.split('.')[0]
-						instance = self.instance_rename(instance)
-						#remove end-numbers from instance
-						module = re.sub(r'[0-9]+$', '', instance)
-						pad_func = func.split('.')[2]
-						pad_func = pad_func.replace('[','')
-						pad_func = pad_func.replace(']','')
-						if len(pinmux_table[(pinmux_table.module==module)&(pinmux_table.instance==instance)&(pinmux_table.pad_func==pad_func)].index.tolist()) == 0:
-							pinmux_table.loc[len(pinmux_table)] = {'module':module,'instance':instance,'pad_func':pad_func,'alt':column_shift,'domain':'batt'}
 						option = func.split('.')[1]
 						pad_opt_list = self.get_opt_list(option)
 						pinmux_table_row_index = pinmux_table[(pinmux_table.module==module)&(pinmux_table.instance==instance)&(pinmux_table.pad_func==pad_func)].index.tolist()[0]
